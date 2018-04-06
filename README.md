@@ -6,15 +6,15 @@
 # Installation
 Add this to your root build.gradle file under repositories:
 
-...
+```
 allprojects {
 	repositories {
 		maven { url "https://jitpack.io" }
 	}
 }
-...
+```
 
 Add this to your app level build.gradle as dependency:
-...
+```
 com.github.codekidX:storage-chooser:2.0.3
-...
+```
