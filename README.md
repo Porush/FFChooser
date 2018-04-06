@@ -3,6 +3,8 @@
 [![GitHub issues](https://img.shields.io/github/issues/Porush/FFChooser.svg?style=for-the-badge)](https://github.com/Porush/FFChooser/issues)
  [![GitHub license](https://img.shields.io/github/license/Porush/FFChooser.svg?style=for-the-badge)](https://github.com/Porush/FFChooser/blob/master/LICENSE)
 
+> This library (repository) is under development and not ready for use.
+
 # Installation
 Add this to your root build.gradle file under repositories:
 
