@@ -8,6 +8,11 @@
 # Screenshots
 ![Screenshot 1](https://github.com/Screenshots/Screenshot1.png "Screenshot 1")![Screenshot 2](https://github.com/Screenshots/Screenshot2.png "Screenshot 2")![Screenshot 3](https://github.com/Screenshots/Screenshot3.png "Screenshot 3")
 
+# Video
+<a href="http://www.youtube.com/watch?feature=player_embedded&v=YOUTUBE_VIDEO_ID_HERE
+" target="_blank"><img src="http://img.youtube.com/vi/YOUTUBE_VIDEO_ID_HERE/0.jpg" 
+alt="IMAGE ALT TEXT HERE" width="240" height="180" border="10" /></a>
+
 # Installation
 Add this to your root build.gradle file under repositories:
 
