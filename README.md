@@ -16,5 +16,5 @@ allprojects {
 
 Add this to your app level build.gradle as dependency:
 ```Gradle
-com.github.codekidX:storage-chooser:2.0.3
+compile 'com.github.Porush:FFChooser:-SNAPSHOT'
 ```
