@@ -6,7 +6,7 @@
 > **This android library (repository) is under development and not ready for use.**
 
 # Screenshots
-![Screenshot 1](https://raw.githubusercontent.com/Porush/FFChooser/master/screenshots/Screenshot%201.png "Screenshot 1")![Screenshot 2](https://raw.githubusercontent.com/Porush/FFChooser/master/screenshots/Screenshot%202.png "Screenshot 2")![Screenshot 3](https://raw.githubusercontent.com/Porush/FFChooser/master/screenshots/Screenshot%203.png "Screenshot 3")
+![screenshots](https://raw.githubusercontent.com/Porush/FFChooser/master/screenshots/screenshots.png "screenshots")
 
 <!---
 # Video
