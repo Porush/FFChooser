@@ -9,6 +9,7 @@
 ![Screenshot 1](https://github.com/Screenshots/Screenshot1.png "Screenshot 1")![Screenshot 2](https://github.com/Screenshots/Screenshot2.png "Screenshot 2")![Screenshot 3](https://github.com/Screenshots/Screenshot3.png "Screenshot 3")
 
 # Video
+[![IMAGE ALT TEXT HERE](http://img.youtube.com/vi/DYfP-UIKxH0/0.jpg)](http://www.youtube.com/watch?v=DYfP-UIKxH0)
 <a href="http://www.youtube.com/watch?feature=player_embedded&v=DYfP-UIKxH0
 " target="_blank"><img src="http://img.youtube.com/vi/DYfP-UIKxH0/0.jpg" 
 alt="IMAGE ALT TEXT HERE" width="240" height="180" border="10" /></a>
