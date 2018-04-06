@@ -6,7 +6,7 @@
 > **This android library (repository) is under development and not ready for use.**
 
 # Screenshots
-![alt text](https://github.com/Screenshots/Screenshot1.png "Screenshot 1")![alt text](https://github.com/Screenshots/Screenshot2.png "Screenshot 2")![alt text](https://github.com/Screenshots/Screenshot3.png "Screenshot 3")
+![Screenshot 1](https://github.com/Screenshots/Screenshot1.png "Screenshot 1")![Screenshot 2](https://github.com/Screenshots/Screenshot2.png "Screenshot 2")![Screenshot 3](https://github.com/Screenshots/Screenshot3.png "Screenshot 3")
 
 # Installation
 Add this to your root build.gradle file under repositories:
