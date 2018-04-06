@@ -1,0 +1,136 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@android:color/white"
+    android:orientation="vertical">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="56dp"
+        android:layout_weight="0"
+        android:background="#e1e1e1"
+        android:elevation="3dp"
+        android:orientation="horizontal">
+
+        <FrameLayout
+            android:layout_width="48dp"
+            android:layout_height="48dp"
+            android:layout_gravity="center_vertical"
+            android:layout_marginLeft="16dp"
+            android:layout_marginRight="16dp"
+            android:clickable="true"
+            android:focusable="true"
+            android:foreground="@drawable/ffchooser_ripple_circle">
+
+            <ImageView
+                android:id="@+id/dialog_secondary_chooser_back"
+                android:layout_width="48dp"
+                android:layout_height="48dp"
+                android:padding="12dp"
+                app:srcCompat="@drawable/ffchooser_icon_arrow_back_black_24dp" />
+        </FrameLayout>
+
+        <TextView
+            android:id="@+id/dialog_secondary_chooser_title"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:fontFamily="sans-serif-medium"
+            android:gravity="center_vertical"
+            android:text="Select File"
+            android:textColor="#373737"
+            android:textSize="18sp" />
+
+    </LinearLayout>
+
+    <TextView
+        android:id="@+id/dialog_secondary_chooser_subtitle"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_weight="0"
+        android:background="#ebebeb"
+        android:ellipsize="marquee"
+        android:focusable="true"
+        android:focusableInTouchMode="true"
+        android:fontFamily="sans-serif"
+        android:marqueeRepeatLimit="marquee_forever"
+        android:paddingBottom="8dp"
+        android:paddingLeft="16dp"
+        android:paddingRight="16dp"
+        android:paddingTop="8dp"
+        android:scrollHorizontally="true"
+        android:singleLine="true"
+        android:text="TextView"
+        android:elevation="2dp"
+        android:textColor="#373737"
+        android:textSize="12sp" />
+
+    <LinearLayout
+        android:id="@+id/dialog_secondary_emptyFolder"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_weight="0"
+        android:background="#f5f5f5"
+        android:gravity="center"
+        android:orientation="vertical"
+        android:visibility="gone">
+
+        <ImageView
+            android:layout_width="128dp"
+            android:layout_height="128dp"
+            android:scaleType="fitXY"
+            android:visibility="gone"
+            app:srcCompat="@drawable/ffchooser_icon_info_black_24dp" />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:fontFamily="sans-serif-medium"
+            android:text="Empty Folder"
+            android:textAllCaps="false"
+            android:textColor="#9b9b9b"
+            android:textSize="20sp" />
+    </LinearLayout>
+
+    <android.support.v7.widget.RecyclerView
+        android:id="@+id/dialog_secondary_recyclerView"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_weight="1"
+        android:background="#f5f5f5"
+        android:clipToPadding="false"
+        android:paddingBottom="8dp"
+        android:paddingTop="8dp"
+        tools:listitem="@layout/layout_secondary_chooser_list_item" />
+
+    <LinearLayout
+        android:id="@+id/dialog_secondary_chooser_footer"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_weight="0"
+        android:background="#e1e1e1"
+        android:elevation="3dp"
+        android:gravity="right"
+        android:orientation="horizontal">
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_margin="8dp"
+            android:background="#e1e1e1"
+            android:clickable="true"
+            android:focusable="true"
+            android:fontFamily="sans-serif-medium"
+            android:foreground="?android:attr/selectableItemBackground"
+            android:paddingBottom="8dp"
+            android:paddingLeft="16dp"
+            android:paddingRight="16dp"
+            android:paddingTop="8dp"
+            android:text="Select"
+            android:textAllCaps="true"
+            android:textColor="#373737" />
+    </LinearLayout>
+
+</LinearLayout>
