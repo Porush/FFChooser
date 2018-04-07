@@ -26,7 +26,7 @@ allprojects {
 
 Add this to your app level build.gradle as dependency:
 ```Gradle
-compile 'com.github.Porush:FFChooser:-SNAPSHOT'
+compile 'com.github.Porush:FFChooser:v0.1-alpha'
 ```
 
 # License
