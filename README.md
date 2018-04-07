@@ -5,7 +5,7 @@
 
 > **This android library (repository) is under development and not ready for use.**
 
-# Screenshots
+# # Screenshots
 ![screenshots](https://raw.githubusercontent.com/Porush/FFChooser/master/screenshots/screenshots.png "screenshots")
 
 <!---
@@ -13,7 +13,7 @@
 [![Video 1](http://img.youtube.com/vi/DYfP-UIKxH0/0.jpg)](http://www.youtube.com/watch?v=DYfP-UIKxH0)
 --->
 
-# Installation
+# # Installation
 Add this to your root build.gradle file under repositories:
 
 ```Gradle
@@ -29,7 +29,32 @@ Add this to your app level build.gradle as dependency:
 compile 'com.github.Porush:FFChooser:v0.1-alpha'
 ```
 
-# License
+# # Use
+```Java
+FFChooser ffChooser = new FFChooser(MainActivity.this, FFChooser.Select_Type_File);
+ffChooser.setShowHidden(true);
+ffChooser.setShowThumbnails(true);
+ffChooser.setMultiSelect(true);
+ffChooser.setOnSelectListener(new FFChooser.OnSelectListener() {
+        @Override
+        public void onSelect(int type, String path) {
+                switch (type) {
+                        case FFChooser.Type_None:
+                                // Canceled
+                                break;
+                        case FFChooser.Type_Local_Storage:
+                                break;
+                        case FFChooser.Type_Google_Drive_Storage:
+                                break;
+                        case FFChooser.Type_One_Drive_Storage:
+                                break;
+                }
+        }
+});
+ffChooser.show();
+```
+
+# # License
 ```
 MIT License
 
