@@ -21,6 +21,7 @@ import android.os.AsyncTask;
 import android.os.Build;
 import android.os.Bundle;
 import android.provider.MediaStore;
+import android.support.design.widget.FloatingActionButton;
 import android.support.v7.widget.DefaultItemAnimator;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -49,11 +50,14 @@ public class FFChooser_SecondaryDialogFragment extends DialogFragment {
     private boolean showHidden = false;
     private boolean showThumbnails = false;
 
-    RecyclerView recyclerView;
-    LinearLayout emptyFolder;
+    private RecyclerView recyclerView;
+    private FFChooser_ListAdapter listAdapter;
+    private LinearLayout emptyFolder;
+    private FloatingActionButton fab;
     private ArrayList<FFChooser_HistoryModel> history;
     private ArrayList<FFChooser_ItemModel> files;
     private FileFilter fileFilter;
+    private File currentFile;
 
     AsyncTask<Integer, Void, Bitmap> loadThumbnailAsyncTask;
 
@@ -76,18 +80,16 @@ public class FFChooser_SecondaryDialogFragment extends DialogFragment {
         Dialog dialog = getDialog();
         if (dialog != null) {
             dialog.setCancelable(false);
-            dialog.getWindow().setLayout(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT);
+            dialog.getWindow().setLayout(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT);
             dialog.getWindow().addFlags(WindowManager.LayoutParams.FLAG_DRAWS_SYSTEM_BAR_BACKGROUNDS);
         }
     }
-
-    FFChooser_ListAdapter listAdapter;
-    File currentFile;
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         final View inflaterView = inflater.inflate(R.layout.dialog_secondary_chooser, container);
         getDialog().getWindow().requestFeature(Window.FEATURE_NO_TITLE);
+        //inflaterView.setFitsSystemWindows(true);
 
         activity = getActivity();
         selectType = getArguments().getInt("selectType", FFChooser.Select_Type_File);
@@ -100,8 +102,9 @@ public class FFChooser_SecondaryDialogFragment extends DialogFragment {
         };
         recyclerView = inflaterView.findViewById(R.id.dialog_secondary_recyclerView);
         emptyFolder = inflaterView.findViewById(R.id.dialog_secondary_emptyFolder);
+        fab = inflaterView.findViewById(R.id.dialog_secondary_chooser_fab);
         if (!multiSelect && selectType == FFChooser.Select_Type_File) {
-            inflaterView.findViewById(R.id.dialog_secondary_chooser_footer).setVisibility(View.GONE);
+            fab.setVisibility(View.GONE);
         }
         switch (selectType) {
             case FFChooser.Select_Type_File:
@@ -112,14 +115,14 @@ public class FFChooser_SecondaryDialogFragment extends DialogFragment {
                 break;
         }
         ((TextView) inflaterView.findViewById(R.id.dialog_secondary_chooser_subtitle)).setText("" + rootFile.getPath());
-        recyclerView.post(new Runnable() {
+        /*recyclerView.post(new Runnable() {
             @Override
             public void run() {
                 ViewGroup.LayoutParams layoutParams = recyclerView.getLayoutParams();
                 layoutParams.width = recyclerView.getWidth();
                 recyclerView.setLayoutParams(layoutParams);
             }
-        });
+        });*/
 
         history = new ArrayList<>();
         history.add(new FFChooser_HistoryModel(rootFile, null));
@@ -190,6 +193,33 @@ public class FFChooser_SecondaryDialogFragment extends DialogFragment {
                 }
             }
         });
+        fab.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                switch (selectType) {
+                    case FFChooser.Select_Type_File:
+                        String path = "";
+                        for (FFChooser_ItemModel ffChooser_itemModel : files) {
+                            if (ffChooser_itemModel.getSelected()) {
+                                if (path.equals("")) {
+                                    path = ffChooser_itemModel.getFile().getPath();
+                                } else {
+                                    path += "," + ffChooser_itemModel.getFile().getPath();
+                                }
+                            }
+                        }
+                        onSelectListener.onSelect(FFChooser.Type_Local_Storage, path);
+                        ffChooser_primaryDialogFragment.dismiss();
+                        dismiss();
+                        break;
+                    case FFChooser.Select_Type_Folder:
+                        onSelectListener.onSelect(FFChooser.Type_Local_Storage, history.get(history.size() - 1).getFile().getPath());
+                        ffChooser_primaryDialogFragment.dismiss();
+                        dismiss();
+                        break;
+                }
+            }
+        });
 
         return inflaterView;
     }
@@ -210,7 +240,7 @@ public class FFChooser_SecondaryDialogFragment extends DialogFragment {
                             activity.runOnUiThread(new Runnable() {
                                 @Override
                                 public void run() {
-                                    if (j <= files.size())
+                                    if (j < files.size())
                                         listAdapter.setFile(j, files.get(j));
                                 }
                             });
@@ -219,7 +249,7 @@ public class FFChooser_SecondaryDialogFragment extends DialogFragment {
                             activity.runOnUiThread(new Runnable() {
                                 @Override
                                 public void run() {
-                                    if (j <= files.size())
+                                    if (j < files.size())
                                         listAdapter.setFile(j, files.get(j));
                                 }
                             });
@@ -232,7 +262,7 @@ public class FFChooser_SecondaryDialogFragment extends DialogFragment {
                             activity.runOnUiThread(new Runnable() {
                                 @Override
                                 public void run() {
-                                    if (j <= files.size())
+                                    if (j < files.size())
                                         listAdapter.setFile(j, files.get(j));
                                 }
                             });
@@ -331,18 +361,11 @@ public class FFChooser_SecondaryDialogFragment extends DialogFragment {
         super.onViewCreated(view, savedInstanceState);
     }
 
-    /*@Override
-    public void onDestroy() {
-        super.onDestroy();
-        onSelectListener.onSelect(FFChooser.Type_None, null);
-    }*/
-
     @Override
     public Dialog onCreateDialog(Bundle savedInstanceState) {
         return new Dialog(getActivity(), getTheme()) {
             @Override
             public void onBackPressed() {
-                //onSelectListener.onSelect(FFChooser.Type_None, null);
                 dismiss();
             }
         };

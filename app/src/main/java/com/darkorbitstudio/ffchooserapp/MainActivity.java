@@ -43,6 +43,7 @@ import com.google.android.gms.drive.events.ChangeListener;
 import com.google.android.gms.tasks.Task;
 
 import java.io.File;
+import java.util.Arrays;
 import java.util.Set;
 
 public class MainActivity extends AppCompatActivity {
@@ -110,7 +111,12 @@ public class MainActivity extends AppCompatActivity {
                                 Log.e("Exc", "Canceled");
                                 break;
                             case FFChooser.Type_Local_Storage:
-                                textView.setText(textView.getText().equals("") ? "> " + path : textView.getText() + "\n\n> " + path);
+                                if (checkBox3.isChecked()) {
+                                    String[] paths = path.split(",");
+                                    textView.setText(textView.getText().equals("") ? "> " + path : textView.getText() + "\n\n> " + Arrays.toString(paths));
+                                } else {
+                                    textView.setText(textView.getText().equals("") ? "> " + path : textView.getText() + "\n\n> " + path);
+                                }
                                 Log.e("Exc", type + "\n" + path);
                                 break;
                             case FFChooser.Type_Google_Drive_Storage:

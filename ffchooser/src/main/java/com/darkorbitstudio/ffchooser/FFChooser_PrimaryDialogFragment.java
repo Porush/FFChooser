@@ -4,8 +4,12 @@ import android.app.Activity;
 import android.app.Dialog;
 import android.app.DialogFragment;
 import android.content.pm.PackageManager;
+import android.os.Build;
 import android.os.Bundle;
 import android.os.Environment;
+import android.support.annotation.Nullable;
+import android.support.v4.os.EnvironmentCompat;
+import android.text.Html;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -92,20 +96,24 @@ public class FFChooser_PrimaryDialogFragment extends DialogFragment {
         }
         File[] storageDirectory = new File("/storage").listFiles();
         for (File file : storageDirectory) {
-            if (otgStorage == null && file.getName().equals("UsbDriveA") || file.getName().equals("USBstorage1") || file.getName().equals("usbdisk") || file.getName().equals("usbotg") || file.getName().equals("UDiskA") || file.getName().equals("usb-storage") || file.getName().equals("usbcard") || file.getName().equals("usb")) {
-                frameLayout_otgStorage.setVisibility(View.VISIBLE);
-                otgStorage = file;
-                otgStorageSubtitle.setText(getSize(otgStorage));
-            } else if (!file.getName().equals(otgStorage == null ? "" : otgStorage.getName())) {
-                if (isDirectoryWritable(file)) {
-                    //if (System.getenv("EXTERNAL_STORAGE") != null && System.getenv("EXTERNAL_STORAGE").equals(file.getPath())) {
-                    externalStorage = file;
-                    externalStorageSubtitle.setText(getSize(externalStorage));
-                    frameLayout_externalStorage.setVisibility(View.VISIBLE);
-                } else {
-                    internalStorage = file;
-                    internalStorageSubtitle.setText(getSize(internalStorage));
-                    frameLayout_internalStorage.setVisibility(View.VISIBLE);
+            String name = file.getName();
+            Log.e("Exc", name + " : " + isDirectoryWritable(file));
+            if (!name.equals("knox-emulated") && !name.equals("emulated") && !name.equals("self") && !name.equals("container")) {
+                if (otgStorage == null && name.equals("UsbDriveA") || name.equals("USBstorage1") || name.equals("usbdisk") || name.equals("usbotg") || name.equals("UDiskA") || name.equals("usb-storage") || name.equals("usbcard") || name.equals("usb")) {
+                    frameLayout_otgStorage.setVisibility(View.VISIBLE);
+                    otgStorage = file;
+                    otgStorageSubtitle.setText(getSize(otgStorage));
+                } else if (!name.equals(otgStorage == null ? "" : otgStorage.getName())) {
+                    if (isDirectoryWritable(file)) {
+                        //if (System.getenv("EXTERNAL_STORAGE") != null && System.getenv("EXTERNAL_STORAGE").equals(file.getPath())) {
+                        externalStorage = file;
+                        externalStorageSubtitle.setText(getSize(externalStorage));
+                        frameLayout_externalStorage.setVisibility(View.VISIBLE);
+                    } else {
+                        internalStorage = file;
+                        internalStorageSubtitle.setText(getSize(internalStorage));
+                        frameLayout_internalStorage.setVisibility(View.VISIBLE);
+                    }
                 }
             }
             /*if (otgStorage == null)
@@ -119,10 +127,11 @@ public class FFChooser_PrimaryDialogFragment extends DialogFragment {
             externalStorageSubtitle.setText(getSize(externalStorage));
             frameLayout_externalStorage.setVisibility(View.VISIBLE);
         }*/
-        /*if (System.getenv("EXTERNAL_STORAGE") != null && !System.getenv("EXTERNAL_STORAGE").equals("") && new File(System.getenv("EXTERNAL_STORAGE")).exists()) {
+        if (System.getenv("EXTERNAL_STORAGE") != null && !System.getenv("EXTERNAL_STORAGE").equals("") && new File(System.getenv("EXTERNAL_STORAGE")).exists()) {
+            externalStorage = new File(System.getenv("EXTERNAL_STORAGE"));
             externalStorageSubtitle.setText(getSize(externalStorage));
             frameLayout_externalStorage.setVisibility(View.VISIBLE);
-        }*/
+        }
         if (appInstalledOrNot("com.google.android.apps.docs")) {
             googleDriveStorageSubtitle.setText("Installed");
             frameLayout_googleDriveStorage.setVisibility(View.VISIBLE);
@@ -130,6 +139,55 @@ public class FFChooser_PrimaryDialogFragment extends DialogFragment {
         if (appInstalledOrNot("com.microsoft.skydrive")) {
             oneDriveStorageSubtitle.setText("Installed");
             frameLayout_oneDriveStorage.setVisibility(View.VISIBLE);
+        }
+
+        if (true) {
+            if (internalStorage != null) {
+                String string = getSize(internalStorage) + " &bull; ";
+                if (isDirectoryReadble(internalStorage))
+                    string += " <font color=#2962ff>R</font>";
+                if (isDirectoryWritable(internalStorage))
+                    string += " <font color=#79b700>W</font>";
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+                    internalStorageSubtitle.setText(Html.fromHtml(string, Html.FROM_HTML_MODE_COMPACT));
+                } else {
+                    internalStorageSubtitle.setText(Html.fromHtml(string));
+                }
+            }
+            if (externalStorage != null) {
+                String string = getSize(externalStorage) + " &bull; ";
+                if (isDirectoryReadble(externalStorage))
+                    string += " <font color=#2962ff>R</font>";
+                if (isDirectoryWritable(externalStorage))
+                    string += " <font color=#79b700>W</font>";
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+                    externalStorageSubtitle.setText(Html.fromHtml(string, Html.FROM_HTML_MODE_COMPACT));
+                } else {
+                    externalStorageSubtitle.setText(Html.fromHtml(string));
+                }
+            }
+            if (otgStorage != null) {
+                String string = getSize(otgStorage) + " &bull; ";
+                if (isDirectoryReadble(otgStorage))
+                    string += " <font color=#2962ff>R</font>";
+                if (isDirectoryWritable(otgStorage))
+                    string += " <font color=#79b700>W</font>";
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+                    otgStorageSubtitle.setText(Html.fromHtml(string, Html.FROM_HTML_MODE_COMPACT));
+                } else {
+                    otgStorageSubtitle.setText(Html.fromHtml(string));
+                }
+            }
+        } else {
+            if (internalStorage != null) {
+                internalStorageSubtitle.setText(getSize(internalStorage));
+            }
+            if (externalStorage != null) {
+                externalStorageSubtitle.setText(getSize(externalStorage));
+            }
+            if (otgStorage != null) {
+                otgStorageSubtitle.setText(getSize(otgStorage));
+            }
         }
 
         close.setOnClickListener(new View.OnClickListener() {
@@ -203,6 +261,14 @@ public class FFChooser_PrimaryDialogFragment extends DialogFragment {
             return decimalFormat.format((float) size / 1048576) + "MiB";
         } else {
             return decimalFormat.format((float) size / 1073741824) + "GiB";
+        }
+    }
+
+    private boolean isDirectoryReadble(File file) {
+        if (file != null && file.exists()) {
+            return file.listFiles() != null;
+        } else {
+            return false;
         }
     }
 
