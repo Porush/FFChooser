@@ -18,7 +18,6 @@ import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
 import android.media.ThumbnailUtils;
 import android.os.AsyncTask;
-import android.os.Build;
 import android.os.Bundle;
 import android.provider.MediaStore;
 import android.support.design.widget.FloatingActionButton;
@@ -51,13 +50,11 @@ public class FFChooser_SecondaryDialogFragment extends DialogFragment {
     private boolean showThumbnails = false;
 
     private RecyclerView recyclerView;
-    private FFChooser_ListAdapter listAdapter;
+    private FFChooser_Secondary_ListAdapter listAdapter;
     private LinearLayout emptyFolder;
-    private FloatingActionButton fab;
     private ArrayList<FFChooser_HistoryModel> history;
     private ArrayList<FFChooser_ItemModel> files;
     private FileFilter fileFilter;
-    private File currentFile;
 
     AsyncTask<Integer, Void, Bitmap> loadThumbnailAsyncTask;
 
@@ -91,135 +88,134 @@ public class FFChooser_SecondaryDialogFragment extends DialogFragment {
         getDialog().getWindow().requestFeature(Window.FEATURE_NO_TITLE);
         //inflaterView.setFitsSystemWindows(true);
 
+        // Init
+        final TextView textView_path = inflaterView.findViewById(R.id.dialog_secondary_chooser_subtitle);
+        recyclerView = inflaterView.findViewById(R.id.dialog_secondary_recyclerView);
+        emptyFolder = inflaterView.findViewById(R.id.dialog_secondary_emptyFolder);
+        FloatingActionButton fab = inflaterView.findViewById(R.id.dialog_secondary_chooser_fab);
         activity = getActivity();
-        selectType = getArguments().getInt("selectType", FFChooser.Select_Type_File);
-        File rootFile = new File(getArguments().getString("rootPath"));
         fileFilter = new FileFilter() {
             @Override
             public boolean accept(File file) {
                 return showHidden || !file.isHidden();
             }
         };
-        recyclerView = inflaterView.findViewById(R.id.dialog_secondary_recyclerView);
-        emptyFolder = inflaterView.findViewById(R.id.dialog_secondary_emptyFolder);
-        fab = inflaterView.findViewById(R.id.dialog_secondary_chooser_fab);
-        if (!multiSelect && selectType == FFChooser.Select_Type_File) {
-            fab.setVisibility(View.GONE);
-        }
-        switch (selectType) {
-            case FFChooser.Select_Type_File:
-                ((TextView) inflaterView.findViewById(R.id.dialog_secondary_chooser_title)).setText("Select File");
-                break;
-            case FFChooser.Select_Type_Folder:
-                ((TextView) inflaterView.findViewById(R.id.dialog_secondary_chooser_title)).setText("Select Folder");
-                break;
-        }
-        ((TextView) inflaterView.findViewById(R.id.dialog_secondary_chooser_subtitle)).setText("" + rootFile.getPath());
-        /*recyclerView.post(new Runnable() {
-            @Override
-            public void run() {
-                ViewGroup.LayoutParams layoutParams = recyclerView.getLayoutParams();
-                layoutParams.width = recyclerView.getWidth();
-                recyclerView.setLayoutParams(layoutParams);
-            }
-        });*/
-
+        selectType = getArguments().getInt("selectType", FFChooser.Select_Type_File);
+        File rootFile = new File(getArguments().getString("rootPath"));
         history = new ArrayList<>();
-        history.add(new FFChooser_HistoryModel(rootFile, null));
-        currentFile = rootFile;
         files = new ArrayList<>();
-        for (File f : rootFile.listFiles(fileFilter)) {
-            files.add(new FFChooser_ItemModel(f));
+
+        if (rootFile.listFiles() == null) {
+            recyclerView.setVisibility(View.GONE);
+            emptyFolder.setVisibility(View.VISIBLE);
+        } else {
+            textView_path.setText(rootFile.getPath());
+            if (!multiSelect && selectType == FFChooser.Select_Type_File) {
+                fab.setVisibility(View.GONE);
+            }
+            switch (selectType) {
+                case FFChooser.Select_Type_File:
+                    ((TextView) inflaterView.findViewById(R.id.dialog_secondary_chooser_title)).setText("Select File");
+                    break;
+                case FFChooser.Select_Type_Folder:
+                    ((TextView) inflaterView.findViewById(R.id.dialog_secondary_chooser_title)).setText("Select Folder");
+                    break;
+            }
+
+            history.add(new FFChooser_HistoryModel(rootFile, null));
+            for (File f : rootFile.listFiles(fileFilter)) {
+                files.add(new FFChooser_ItemModel(f));
+            }
+            Sort(files);
+
+            listAdapter = new FFChooser_Secondary_ListAdapter(files);
+            final LinearLayoutManager linearLayoutManager = new LinearLayoutManager(activity.getApplicationContext(), LinearLayoutManager.VERTICAL, false);
+            recyclerView.setLayoutManager(linearLayoutManager);
+            recyclerView.setItemAnimator(new DefaultItemAnimator());
+            recyclerView.setAdapter(listAdapter);
+
+            recyclerView.addOnItemTouchListener(
+                    new FFChooser_RecyclerViewOnItemClickListener(activity.getApplicationContext(), new FFChooser_RecyclerViewOnItemClickListener.OnItemClickListener() {
+                        @Override
+                        public void onItemClick(View view, int position) {
+                            File file = files.get(position).getFile();
+                            if (file.isDirectory()) {
+                                textView_path.setText(file.getPath());
+                                history.add(new FFChooser_HistoryModel(files.get(position).getFile(), linearLayoutManager.onSaveInstanceState()));
+                                if (loadThumbnailAsyncTask != null && loadThumbnailAsyncTask.getStatus() != AsyncTask.Status.FINISHED)
+                                    loadThumbnailAsyncTask.cancel(true);
+                                files = new ArrayList<>();
+                                for (File f : file.listFiles(fileFilter)) {
+                                    files.add(new FFChooser_ItemModel(f));
+                                }
+                                Sort(files);
+                                loadThumbnail();
+                                listAdapter.setFiles(files);
+                                recyclerView.scrollToPosition(0);
+                            } else if (file.isFile()) {
+                                if (selectType == FFChooser.Select_Type_File) {
+                                    if (multiSelect) {
+                                        files.get(position).setSelected(!files.get(position).getSelected());
+                                        listAdapter.setSelected(position, files.get(position).getSelected());
+                                    } else {
+                                        onSelectListener.onSelect(FFChooser.Type_Local_Storage, file.getPath());
+                                        ffChooser_primaryDialogFragment.dismiss();
+                                        dismiss();
+                                    }
+                                }
+                            }
+                        }
+                    })
+            );
+            inflaterView.findViewById(R.id.dialog_secondary_chooser_back).setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View view) {
+                    if (history.size() > 1) {
+                        if (loadThumbnailAsyncTask != null && loadThumbnailAsyncTask.getStatus() != AsyncTask.Status.FINISHED)
+                            loadThumbnailAsyncTask.cancel(true);
+                        files = new ArrayList<>();
+                        textView_path.setText(history.get(history.size() - 2).getFile().getPath());
+                        for (File f : history.get(history.size() - 2).getFile().listFiles(fileFilter)) {
+                            files.add(new FFChooser_ItemModel(f));
+                        }
+                        Sort(files);
+                        loadThumbnail();
+                        listAdapter.setFiles(files);
+                        linearLayoutManager.onRestoreInstanceState(history.get(history.size() - 1).getParcelable());
+                        history.remove(history.size() - 1);
+                    } else if (history.size() == 1) {
+                        dismiss();
+                    }
+                }
+            });
+            fab.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View view) {
+                    switch (selectType) {
+                        case FFChooser.Select_Type_File:
+                            String path = "";
+                            for (FFChooser_ItemModel ffChooser_itemModel : files) {
+                                if (ffChooser_itemModel.getSelected()) {
+                                    if (path.equals("")) {
+                                        path = ffChooser_itemModel.getFile().getPath();
+                                    } else {
+                                        path += "," + ffChooser_itemModel.getFile().getPath();
+                                    }
+                                }
+                            }
+                            onSelectListener.onSelect(FFChooser.Type_Local_Storage, path);
+                            ffChooser_primaryDialogFragment.dismiss();
+                            dismiss();
+                            break;
+                        case FFChooser.Select_Type_Folder:
+                            onSelectListener.onSelect(FFChooser.Type_Local_Storage, history.get(history.size() - 1).getFile().getPath());
+                            ffChooser_primaryDialogFragment.dismiss();
+                            dismiss();
+                            break;
+                    }
+                }
+            });
         }
-        Sort(files);
-
-        listAdapter = new FFChooser_ListAdapter(files);
-        final LinearLayoutManager linearLayoutManager = new LinearLayoutManager(activity.getApplicationContext(), LinearLayoutManager.VERTICAL, false);
-        recyclerView.setLayoutManager(linearLayoutManager);
-        recyclerView.setItemAnimator(new DefaultItemAnimator());
-        recyclerView.setAdapter(listAdapter);
-
-        recyclerView.addOnItemTouchListener(
-                new FFChooser_RecyclerViewOnItemClickListener(activity.getApplicationContext(), new FFChooser_RecyclerViewOnItemClickListener.OnItemClickListener() {
-                    @Override
-                    public void onItemClick(View view, int position) {
-                        File file = files.get(position).getFile();
-                        if (file.isDirectory()) {
-                            ((TextView) inflaterView.findViewById(R.id.dialog_secondary_chooser_subtitle)).setText(file.getPath());
-                            history.add(new FFChooser_HistoryModel(files.get(position).getFile(), linearLayoutManager.onSaveInstanceState()));
-                            if (loadThumbnailAsyncTask != null && loadThumbnailAsyncTask.getStatus() != AsyncTask.Status.FINISHED)
-                                loadThumbnailAsyncTask.cancel(true);
-                            files = new ArrayList<>();
-                            for (File f : file.listFiles(fileFilter)) {
-                                files.add(new FFChooser_ItemModel(f));
-                            }
-                            Sort(files);
-                            loadThumbnail();
-                            listAdapter.setFiles(files);
-                            recyclerView.scrollToPosition(0);
-                        } else if (file.isFile()) {
-                            if (selectType == FFChooser.Select_Type_File) {
-                                if (multiSelect) {
-                                    files.get(position).setSelected(!files.get(position).getSelected());
-                                    listAdapter.setSelected(position, files.get(position).getSelected());
-                                } else {
-                                    onSelectListener.onSelect(FFChooser.Type_Local_Storage, file.getPath());
-                                    ffChooser_primaryDialogFragment.dismiss();
-                                    dismiss();
-                                }
-                            }
-                        }
-                    }
-                })
-        );
-        inflaterView.findViewById(R.id.dialog_secondary_chooser_back).setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                if (history.size() > 1) {
-                    if (loadThumbnailAsyncTask != null && loadThumbnailAsyncTask.getStatus() != AsyncTask.Status.FINISHED)
-                        loadThumbnailAsyncTask.cancel(true);
-                    files = new ArrayList<>();
-                    ((TextView) inflaterView.findViewById(R.id.dialog_secondary_chooser_subtitle)).setText(history.get(history.size() - 2).getFile().getPath());
-                    for (File f : history.get(history.size() - 2).getFile().listFiles(fileFilter)) {
-                        files.add(new FFChooser_ItemModel(f));
-                    }
-                    Sort(files);
-                    loadThumbnail();
-                    listAdapter.setFiles(files);
-                    linearLayoutManager.onRestoreInstanceState(history.get(history.size() - 1).getParcelable());
-                    history.remove(history.size() - 1);
-                } else if (history.size() == 1) {
-                    dismiss();
-                }
-            }
-        });
-        fab.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                switch (selectType) {
-                    case FFChooser.Select_Type_File:
-                        String path = "";
-                        for (FFChooser_ItemModel ffChooser_itemModel : files) {
-                            if (ffChooser_itemModel.getSelected()) {
-                                if (path.equals("")) {
-                                    path = ffChooser_itemModel.getFile().getPath();
-                                } else {
-                                    path += "," + ffChooser_itemModel.getFile().getPath();
-                                }
-                            }
-                        }
-                        onSelectListener.onSelect(FFChooser.Type_Local_Storage, path);
-                        ffChooser_primaryDialogFragment.dismiss();
-                        dismiss();
-                        break;
-                    case FFChooser.Select_Type_Folder:
-                        onSelectListener.onSelect(FFChooser.Type_Local_Storage, history.get(history.size() - 1).getFile().getPath());
-                        ffChooser_primaryDialogFragment.dismiss();
-                        dismiss();
-                        break;
-                }
-            }
-        });
 
         return inflaterView;
     }

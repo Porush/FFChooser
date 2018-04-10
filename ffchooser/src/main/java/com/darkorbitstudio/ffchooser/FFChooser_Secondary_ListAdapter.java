@@ -19,7 +19,7 @@ import java.util.ArrayList;
  * Created by Porush Manjhi on 16-02-2018.
  */
 
-class FFChooser_ListAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
+class FFChooser_Secondary_ListAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
 
     private ArrayList<FFChooser_ItemModel> files;
 
@@ -37,7 +37,7 @@ class FFChooser_ListAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder
         }
     }
 
-    public FFChooser_ListAdapter(ArrayList<FFChooser_ItemModel> files) {
+    public FFChooser_Secondary_ListAdapter(ArrayList<FFChooser_ItemModel> files) {
         this.files = files;
     }
 

@@ -6,6 +6,7 @@ import android.content.IntentSender;
 import android.graphics.Typeface;
 import android.os.Bundle;
 import android.os.Environment;
+import android.os.Handler;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v4.os.EnvironmentCompat;
 import android.support.v7.app.AppCompatActivity;
@@ -22,6 +23,7 @@ import android.widget.TextView;
 
 import com.darkorbitstudio.ffchooser.FFChooser;
 import com.darkorbitstudio.ffchooser.FFChooser_PrimaryDialogFragment;
+import com.darkorbitstudio.ffchooser.FFChooser_ProgressView;
 import com.google.android.gms.auth.api.signin.GoogleSignIn;
 import com.google.android.gms.auth.api.signin.GoogleSignInAccount;
 import com.google.android.gms.auth.api.signin.GoogleSignInClient;
@@ -44,6 +46,7 @@ import com.google.android.gms.tasks.Task;
 
 import java.io.File;
 import java.util.Arrays;
+import java.util.Random;
 import java.util.Set;
 
 public class MainActivity extends AppCompatActivity {
@@ -139,6 +142,21 @@ public class MainActivity extends AppCompatActivity {
                 ffChooser.show();
             }
         });
+
+        final FFChooser_ProgressView ffChooser_progressView = findViewById(R.id.progress);
+        final Handler handler = new Handler();
+        final int delay = 2000; //milliseconds
+        handler.postDelayed(new Runnable(){
+            public void run(){
+                runOnUiThread(new Runnable() {
+                    @Override
+                    public void run() {
+                        ffChooser_progressView.setProgress(((new Random()).nextInt((100 - 0) + 1)));
+                    }
+                });
+                handler.postDelayed(this, delay);
+            }
+        }, delay);
     }
 
     @SuppressLint("RestrictedApi")
