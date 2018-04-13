@@ -149,6 +149,7 @@
                         android:id="@+id/progress"
                         android:layout_width="match_parent"
                         android:layout_height="3dp"
+                        android:visibility="gone"
                         app:color="#373737"
                         app:progress="0" />
 
