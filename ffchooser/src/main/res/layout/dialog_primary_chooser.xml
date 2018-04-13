@@ -54,39 +54,20 @@
         android:paddingRight="16dp"
         android:visibility="gone">
 
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="R"
-            android:textColor="#2962ff"
-            android:textSize="12sp" />
-
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="   =   Readable"
-            android:textColor="#373737"
-            android:textSize="12sp" />
-
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
+        <ImageView
+            android:id="@+id/imageView"
+            android:layout_width="48dp"
+            android:layout_height="match_parent"
             android:padding="8dp"
-            android:text="/"
-            android:textColor="#373737"
-            android:textSize="12sp" />
+            app:srcCompat="@drawable/ffchooser_icon_info_outline_black_24dp" />
 
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="W"
-            android:textColor="#79b700"
-            android:textSize="12sp" />
-
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="   =   Writable"
+            android:paddingBottom="8dp"
+            android:paddingLeft="16dp"
+            android:paddingTop="8dp"
+            android:text="R = Readable / W = Writable"
             android:textColor="#373737"
             android:textSize="12sp" />
 

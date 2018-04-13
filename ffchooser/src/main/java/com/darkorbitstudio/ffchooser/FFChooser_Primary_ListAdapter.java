@@ -63,27 +63,46 @@ class FFChooser_Primary_ListAdapter extends RecyclerView.Adapter<RecyclerView.Vi
         final ItemViewHolder holder = (ItemViewHolder) viewHolder;
         final File file = files.get(position);
 
-        holder.title.setText(file.getName());
-        if (isDirectoryReadble(file)) {
-            holder.readable.setVisibility(View.VISIBLE);
-        } else {
+        if (file.getPath().equals("com.google.android.apps.docs")) {
+            holder.icon.setImageResource(R.drawable.ffchooser_icon_cloud_white_24dp);
+            holder.title.setText("Google Drive");
+            holder.totalSpace.setText("Installed");
             holder.readable.setVisibility(View.GONE);
-        }
-        if (isDirectoryWritable(file)) {
-            holder.writable.setVisibility(View.VISIBLE);
-        } else {
             holder.writable.setVisibility(View.GONE);
-        }
-        /*long totalSpace = file.getTotalSpace();
-        long freeSpace = file.getFreeSpace();
-        holder.totalSpace.setText(formatSize(totalSpace) + " Total");
-        holder.freeSpace.setText(formatSize(freeSpace) + " Free");
-        if (totalSpace == 0) {
-            holder.progressView.setProgress(100);
+            holder.progressView.setVisibility(View.GONE);
+            //holder.totalSpace.setVisibility(View.GONE);
+            holder.freeSpace.setVisibility(View.GONE);
+        } else if (file.getPath().equals("com.microsoft.skydrive")) {
+            holder.icon.setImageResource(R.drawable.ffchooser_icon_cloud_white_24dp);
+            holder.title.setText("One Drive");
+            holder.totalSpace.setText("Installed");
+            holder.readable.setVisibility(View.GONE);
+            holder.writable.setVisibility(View.GONE);
+            holder.progressView.setVisibility(View.GONE);
+            //holder.totalSpace.setVisibility(View.GONE);
+            holder.freeSpace.setVisibility(View.GONE);
         } else {
-            holder.progressView.setProgress(100 - (int) (freeSpace * 100 / totalSpace));
-        }*/
-        showSpace(holder, file);
+            holder.progressView.setVisibility(View.VISIBLE);
+            //holder.totalSpace.setVisibility(View.VISIBLE);
+            holder.freeSpace.setVisibility(View.VISIBLE);
+            if (file.getName().toLowerCase().contains("otg")) {
+                holder.icon.setImageResource(R.drawable.ffchooser_icon_usb_white_24dp);
+            } else {
+                holder.icon.setImageResource(R.drawable.ffchooser_icon_storage_white_24dp);
+            }
+            holder.title.setText(file.getName());
+            if (isDirectoryReadble(file)) {
+                holder.readable.setVisibility(View.VISIBLE);
+            } else {
+                holder.readable.setVisibility(View.GONE);
+            }
+            if (isDirectoryWritable(file)) {
+                holder.writable.setVisibility(View.VISIBLE);
+            } else {
+                holder.writable.setVisibility(View.GONE);
+            }
+            showSpace(holder, file);
+        }
     }
 
     private void showSpace(final ItemViewHolder holder, final File file) {
@@ -132,7 +151,7 @@ class FFChooser_Primary_ListAdapter extends RecyclerView.Adapter<RecyclerView.Vi
 
     private boolean isDirectoryWritable(File file) {
         if (file != null && file.exists()) {
-            file = new File(file.getPath() + "/writeTest");
+            file = new File(file.getPath() + "/.writeTest");
             if (file.mkdir()) {
                 file.delete();
                 return true;

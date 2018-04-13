@@ -30,9 +30,6 @@ import java.util.ArrayList;
 
 public class FFChooser_PrimaryDialogFragment extends DialogFragment {
 
-    private File rootStorage;
-    private File internalStorage;
-    private File externalStorage;
     private File otgStorage;
 
     private Activity activity;
@@ -73,9 +70,6 @@ public class FFChooser_PrimaryDialogFragment extends DialogFragment {
 
         activity = getActivity();
         selectType = getArguments().getInt("selectType", FFChooser.Select_Type_File);
-        rootStorage = new File("/");
-        internalStorage = Environment.getDataDirectory();
-        externalStorage = new File("/sdcard");
 
         final RecyclerView recyclerView = inflaterView.findViewById(R.id.dialog_primary_chooser_recyclerView);
         final ArrayList<File> files = new ArrayList<>();
@@ -84,6 +78,13 @@ public class FFChooser_PrimaryDialogFragment extends DialogFragment {
             if (!name.equals("knox-emulated") && !name.equals("emulated") && !name.equals("self") && !name.equals("container"))
                 files.add(file);
         }
+        if (selectType == FFChooser.Select_Type_File && appInstalledOrNot("com.google.android.apps.docs")) {
+            files.add(new File("com.google.android.apps.docs"));
+        }
+        if (selectType == FFChooser.Select_Type_File && appInstalledOrNot("com.microsoft.skydrive")) {
+            files.add(new File("com.microsoft.skydrive"));
+        }
+
         final FFChooser_Primary_ListAdapter listAdapter = new FFChooser_Primary_ListAdapter(files);
         final LinearLayoutManager linearLayoutManager = new LinearLayoutManager(activity.getApplicationContext(), LinearLayoutManager.VERTICAL, false);
         recyclerView.setLayoutManager(linearLayoutManager);
@@ -94,7 +95,16 @@ public class FFChooser_PrimaryDialogFragment extends DialogFragment {
                 new FFChooser_RecyclerViewOnItemClickListener(activity.getApplicationContext(), new FFChooser_RecyclerViewOnItemClickListener.OnItemClickListener() {
                     @Override
                     public void onItemClick(View view, int position) {
-                        showStorage(FFChooser.Type_Local_Storage, files.get(position));
+                        File file = files.get(position);
+                        if (file.getPath().equals("com.google.android.apps.docs")) {
+                            onSelectListener.onSelect(FFChooser.Type_Google_Drive_Storage, null);
+                            dismiss();
+                        } else if (file.getPath().equals("com.microsoft.skydrive")) {
+                            onSelectListener.onSelect(FFChooser.Type_One_Drive_Storage, null);
+                            dismiss();
+                        } else {
+                            showStorage(FFChooser.Type_Local_Storage, file);
+                        }
                     }
                 })
         );
@@ -106,43 +116,8 @@ public class FFChooser_PrimaryDialogFragment extends DialogFragment {
             }
         });
 
-        if (System.getenv("USBOTG_STORAGE") != null && !System.getenv("USBOTG_STORAGE").equals("") && new File(System.getenv("USBOTG_STORAGE")).exists()) {
-            otgStorage = new File(System.getenv("USBOTG_STORAGE"));
-        }
-        File[] storageDirectory = new File("/storage").listFiles();
-        for (File file : storageDirectory) {
-            String name = file.getName();
-            Log.e("Exc", name + " : " + isDirectoryWritable(file));
-            if (!name.equals("knox-emulated") && !name.equals("emulated") && !name.equals("self") && !name.equals("container")) {
-                if (otgStorage == null && name.equals("UsbDriveA") || name.equals("USBstorage1") || name.equals("usbdisk") || name.equals("usbotg") || name.equals("UDiskA") || name.equals("usb-storage") || name.equals("usbcard") || name.equals("usb")) {
-                    otgStorage = file;
-                } else if (!name.equals(otgStorage == null ? "" : otgStorage.getName())) {
-                    if (isDirectoryWritable(file)) {
-                        //if (System.getenv("EXTERNAL_STORAGE") != null && System.getenv("EXTERNAL_STORAGE").equals(file.getPath())) {
-                        externalStorage = file;
-                    } else {
-                        internalStorage = file;
-                    }
-                }
-            }
-            /*if (otgStorage == null)
-                if (file.getName().equals("UsbDriveA") || file.getName().equals("USBstorage1") || file.getName().equals("usbdisk") || file.getName().equals("usbotg") || file.getName().equals("UDiskA") || file.getName().equals("usb-storage") || file.getName().equals("usbcard") || file.getName().equals("usb")) {
-                    otgStorageSubtitle.setText(getSize(file));
-                    frameLayout_otgStorage.setVisibility(View.VISIBLE);
-                    otgStorage = file;
-                }*/
-        }
-        /*if (Environment.getExternalStorageState().equals(Environment.MEDIA_MOUNTED)) {
-            externalStorageSubtitle.setText(getSize(externalStorage));
-            frameLayout_externalStorage.setVisibility(View.VISIBLE);
-        }*/
-        if (System.getenv("EXTERNAL_STORAGE") != null && !System.getenv("EXTERNAL_STORAGE").equals("") && new File(System.getenv("EXTERNAL_STORAGE")).exists()) {
-            externalStorage = new File(System.getenv("EXTERNAL_STORAGE"));
-        }
-        if (appInstalledOrNot("com.google.android.apps.docs")) {
-        }
-        if (appInstalledOrNot("com.microsoft.skydrive")) {
-        }
+        //System.getenv("EXTERNAL_STORAGE")
+        //System.getenv("USBOTG_STORAGE")
 
         return inflaterView;
     }
