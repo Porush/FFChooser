@@ -119,10 +119,10 @@
         android:layout_alignParentBottom="true"
         android:layout_alignParentEnd="true"
         android:layout_alignParentRight="true"
-        android:layout_margin="16dp"
         android:clickable="true"
         android:tint="#373737"
         app:backgroundTint="#e1e1e1"
-        app:srcCompat="@drawable/ffchooser_icon_check_white_24dp" />
+        app:srcCompat="@drawable/ffchooser_icon_check_white_24dp"
+        app:useCompatPadding="true"/>
 
 </RelativeLayout>

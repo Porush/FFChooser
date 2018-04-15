@@ -5,7 +5,7 @@ import android.graphics.Bitmap;
 import java.io.File;
 
 /**
- * Created by Ghanshyam Raikwar on 26-03-2018.
+ * Created by Porush Manjhi on 12-05-2017.
  */
 
 public class FFChooser_ItemModel {

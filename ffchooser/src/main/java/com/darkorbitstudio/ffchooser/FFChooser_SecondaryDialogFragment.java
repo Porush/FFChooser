@@ -24,7 +24,6 @@ import android.support.design.widget.FloatingActionButton;
 import android.support.v7.widget.DefaultItemAnimator;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -39,11 +38,17 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
 
+import com.darkorbitstudio.ffchooser.FFChooser.OnSelectListener;
+
+/**
+ * Created by Porush Manjhi on 12-05-2017.
+ */
+
 public class FFChooser_SecondaryDialogFragment extends DialogFragment {
 
     private Activity activity;
     private FFChooser_PrimaryDialogFragment ffChooser_primaryDialogFragment;
-    private static FFChooser_PrimaryDialogFragment.OnSelectListener onSelectListener;
+    private static OnSelectListener onSelectListener;
     private int selectType = FFChooser.Select_Type_File;
     private boolean multiSelect = false;
     private boolean showHidden = false;
@@ -128,45 +133,44 @@ public class FFChooser_SecondaryDialogFragment extends DialogFragment {
             }
             Sort(files);
 
-            listAdapter = new FFChooser_Secondary_ListAdapter(files);
             final LinearLayoutManager linearLayoutManager = new LinearLayoutManager(activity.getApplicationContext(), LinearLayoutManager.VERTICAL, false);
             recyclerView.setLayoutManager(linearLayoutManager);
             recyclerView.setItemAnimator(new DefaultItemAnimator());
-            recyclerView.setAdapter(listAdapter);
-
-            recyclerView.addOnItemTouchListener(
-                    new FFChooser_RecyclerViewOnItemClickListener(activity.getApplicationContext(), new FFChooser_RecyclerViewOnItemClickListener.OnItemClickListener() {
-                        @Override
-                        public void onItemClick(View view, int position) {
-                            File file = files.get(position).getFile();
-                            if (file.isDirectory()) {
-                                textView_path.setText(file.getPath());
-                                history.add(new FFChooser_HistoryModel(files.get(position).getFile(), linearLayoutManager.onSaveInstanceState()));
-                                if (loadThumbnailAsyncTask != null && loadThumbnailAsyncTask.getStatus() != AsyncTask.Status.FINISHED)
-                                    loadThumbnailAsyncTask.cancel(true);
-                                files = new ArrayList<>();
-                                for (File f : file.listFiles(fileFilter)) {
-                                    files.add(new FFChooser_ItemModel(f));
-                                }
-                                Sort(files);
-                                loadThumbnail();
-                                listAdapter.setFiles(files);
-                                recyclerView.scrollToPosition(0);
-                            } else if (file.isFile()) {
-                                if (selectType == FFChooser.Select_Type_File) {
-                                    if (multiSelect) {
-                                        files.get(position).setSelected(!files.get(position).getSelected());
-                                        listAdapter.setSelected(position, files.get(position).getSelected());
-                                    } else {
-                                        onSelectListener.onSelect(FFChooser.Type_Local_Storage, file.getPath());
-                                        ffChooser_primaryDialogFragment.dismiss();
-                                        dismiss();
-                                    }
-                                }
+            listAdapter = new FFChooser_Secondary_ListAdapter(files, new FFChooser_OnItemClickListener() {
+                @Override
+                public void onItemClick(View v, int position) {
+                    File file = files.get(position).getFile();
+                    if (file.isDirectory()) {
+                        textView_path.setText(file.getPath());
+                        history.add(new FFChooser_HistoryModel(files.get(position).getFile(), linearLayoutManager.onSaveInstanceState()));
+                        if (loadThumbnailAsyncTask != null && loadThumbnailAsyncTask.getStatus() != AsyncTask.Status.FINISHED)
+                            loadThumbnailAsyncTask.cancel(true);
+                        files = new ArrayList<>();
+                        for (File f : file.listFiles(fileFilter)) {
+                            files.add(new FFChooser_ItemModel(f));
+                        }
+                        Sort(files);
+                        loadThumbnail();
+                        listAdapter.setFiles(files);
+                        recyclerView.scrollToPosition(0);
+                    } else if (file.isFile()) {
+                        if (selectType == FFChooser.Select_Type_File) {
+                            if (multiSelect) {
+                                files.get(position).setSelected(!files.get(position).getSelected());
+                                listAdapter.setSelected(position, files.get(position).getSelected());
+                            } else {
+                                if (onSelectListener != null)
+                                    onSelectListener.onSelect(FFChooser.Type_Local_Storage, file.getPath());
+                                if (ffChooser_primaryDialogFragment != null)
+                                    ffChooser_primaryDialogFragment.dismiss();
+                                dismiss();
                             }
                         }
-                    })
-            );
+                    }
+                }
+            });
+            recyclerView.setAdapter(listAdapter);
+
             inflaterView.findViewById(R.id.dialog_secondary_chooser_back).setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View view) {
@@ -188,6 +192,7 @@ public class FFChooser_SecondaryDialogFragment extends DialogFragment {
                     }
                 }
             });
+
             fab.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View view) {
@@ -203,13 +208,17 @@ public class FFChooser_SecondaryDialogFragment extends DialogFragment {
                                     }
                                 }
                             }
-                            onSelectListener.onSelect(FFChooser.Type_Local_Storage, path);
-                            ffChooser_primaryDialogFragment.dismiss();
+                            if (onSelectListener != null)
+                                onSelectListener.onSelect(FFChooser.Type_Local_Storage, path);
+                            if (ffChooser_primaryDialogFragment != null)
+                                ffChooser_primaryDialogFragment.dismiss();
                             dismiss();
                             break;
                         case FFChooser.Select_Type_Folder:
-                            onSelectListener.onSelect(FFChooser.Type_Local_Storage, history.get(history.size() - 1).getFile().getPath());
-                            ffChooser_primaryDialogFragment.dismiss();
+                            if (onSelectListener != null)
+                                onSelectListener.onSelect(FFChooser.Type_Local_Storage, history.get(history.size() - 1).getFile().getPath());
+                            if (ffChooser_primaryDialogFragment != null)
+                                ffChooser_primaryDialogFragment.dismiss();
                             dismiss();
                             break;
                     }
@@ -347,11 +356,6 @@ public class FFChooser_SecondaryDialogFragment extends DialogFragment {
         }
     }
 
-    private void show() {
-        FFChooser_PrimaryDialogFragment ffChooser_primaryDialogFragment = FFChooser_PrimaryDialogFragment.newInstance(selectType);
-        ffChooser_primaryDialogFragment.show(getFragmentManager(), "Tag");
-    }
-
     @Override
     public void onViewCreated(View view, Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
@@ -371,21 +375,8 @@ public class FFChooser_SecondaryDialogFragment extends DialogFragment {
         this.ffChooser_primaryDialogFragment = ffChooser_primaryDialogFragment;
     }
 
-    public void setOnSelectListener(FFChooser_PrimaryDialogFragment.OnSelectListener onSelectListener) {
+    public void setOnSelectListener(OnSelectListener onSelectListener) {
         FFChooser_SecondaryDialogFragment.onSelectListener = onSelectListener;
-    }
-
-    private FFChooser_PrimaryDialogFragment.OnSelectListener getDefaultOnSelectListener() {
-        return new FFChooser_PrimaryDialogFragment.OnSelectListener() {
-            @Override
-            public void onSelect(int type, String path) {
-                Log.e("Exc", "No OnSelectListener found.\nType : " + type + "\nPath : " + path);
-            }
-        };
-    }
-
-    public interface OnSelectListener {
-        void onSelect(int type, String path);
     }
 
     public void setMultiSelect(boolean multiSelect) {

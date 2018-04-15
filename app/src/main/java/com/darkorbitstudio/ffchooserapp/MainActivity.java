@@ -2,7 +2,6 @@ package com.darkorbitstudio.ffchooserapp;
 
 import android.graphics.Typeface;
 import android.os.Bundle;
-import android.os.Handler;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
@@ -15,10 +14,12 @@ import android.widget.RadioGroup;
 import android.widget.TextView;
 
 import com.darkorbitstudio.ffchooser.FFChooser;
-import com.darkorbitstudio.ffchooser.FFChooser_ProgressView;
 
 import java.util.Arrays;
-import java.util.Random;
+
+/**
+ * Created by Porush Manjhi on 12-05-2017.
+ */
 
 public class MainActivity extends AppCompatActivity {
 
@@ -53,6 +54,8 @@ public class MainActivity extends AppCompatActivity {
         final CheckBox checkBox1 = (CheckBox) findViewById(R.id.checkBox1);
         final CheckBox checkBox2 = (CheckBox) findViewById(R.id.checkBox2);
         final CheckBox checkBox3 = (CheckBox) findViewById(R.id.checkBox3);
+        final CheckBox checkBox4 = (CheckBox) findViewById(R.id.checkBox4);
+        final CheckBox checkBox5 = (CheckBox) findViewById(R.id.checkBox5);
         final TextView textView = (TextView) findViewById(R.id.textView);
         FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
         fab.setOnClickListener(new View.OnClickListener() {
@@ -68,6 +71,8 @@ public class MainActivity extends AppCompatActivity {
                 ffChooser.setShowHidden(checkBox1.isChecked());
                 ffChooser.setShowThumbnails(checkBox2.isChecked());
                 ffChooser.setMultiSelect(checkBox3.isChecked());
+                ffChooser.setShowGoogleDrive(checkBox4.isChecked());
+                ffChooser.setShowOneDrive(checkBox5.isChecked());
                 ffChooser.setOnSelectListener(new FFChooser.OnSelectListener() {
                     @Override
                     public void onSelect(int type, String path) {

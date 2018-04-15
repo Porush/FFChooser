@@ -9,6 +9,10 @@ import android.util.AttributeSet;
 import android.widget.FrameLayout;
 import android.widget.LinearLayout;
 
+/**
+ * Created by Porush Manjhi on 12-05-2017.
+ */
+
 public class FFChooser_ProgressView extends LinearLayout {
 
     FrameLayout frameLayout1;

@@ -119,6 +119,18 @@
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:text="Multiple file select" />
+
+                    <CheckBox
+                        android:id="@+id/checkBox4"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:text="Add 'Google Drive'" />
+
+                    <CheckBox
+                        android:id="@+id/checkBox5"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:text="Add 'One Drive'" />
                 </LinearLayout>
             </android.support.v7.widget.CardView>
 

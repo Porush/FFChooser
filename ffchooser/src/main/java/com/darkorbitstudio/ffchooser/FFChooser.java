@@ -64,6 +64,8 @@ public class FFChooser {
     private boolean multiSelect = false;
     private boolean showHidden = false;
     private boolean showThumbnails = false;
+    private boolean showGoogleDrive = false;
+    private boolean showOneDrive = false;
 
     public FFChooser(Activity activity, int selectType) {
         this.activity = activity;
@@ -72,21 +74,17 @@ public class FFChooser {
 
     public void show() {
 
-        if (onSelectListener == null) {
+        if (onSelectListener == null)
             onSelectListener = getDefaultOnSelectListener();
-        }
 
         FFChooser_PrimaryDialogFragment ffChooser_primaryDialogFragment = FFChooser_PrimaryDialogFragment.newInstance(selectType);
         ffChooser_primaryDialogFragment.setShowThumbnails(showThumbnails);
         ffChooser_primaryDialogFragment.setMultiSelect(multiSelect);
         ffChooser_primaryDialogFragment.setShowHidden(showHidden);
-        ffChooser_primaryDialogFragment.setOnSelectListener(new FFChooser_PrimaryDialogFragment.OnSelectListener() {
-            @Override
-            public void onSelect(int type, String path) {
-                onSelectListener.onSelect(type, path);
-            }
-        });
-        ffChooser_primaryDialogFragment.show(activity.getFragmentManager(), "Tag");
+        ffChooser_primaryDialogFragment.setShowGoogleDrive(showGoogleDrive);
+        ffChooser_primaryDialogFragment.setShowOneDrive(showOneDrive);
+        ffChooser_primaryDialogFragment.setOnSelectListener(onSelectListener);
+        ffChooser_primaryDialogFragment.show(activity.getFragmentManager(), "FFChooser");
 
     }
 
@@ -98,7 +96,7 @@ public class FFChooser {
         return new OnSelectListener() {
             @Override
             public void onSelect(int type, String path) {
-                Log.e("Exc", "No OnSelectListener found.\nType : " + type + "\nPath : " + path);
+                Log.e("FFChooser", "No OnSelectListener found.\nType : " + type + "\nPath : " + path);
             }
         };
     }
@@ -117,6 +115,14 @@ public class FFChooser {
 
     public void setShowThumbnails(boolean showThumbnails) {
         this.showThumbnails = showThumbnails;
+    }
+
+    public void setShowGoogleDrive(boolean showGoogleDrive) {
+        this.showGoogleDrive = showGoogleDrive;
+    }
+
+    public void setShowOneDrive(boolean showOneDrive) {
+        this.showOneDrive = showOneDrive;
     }
 
 }

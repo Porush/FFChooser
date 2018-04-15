@@ -1,6 +1,5 @@
 package com.darkorbitstudio.ffchooser;
 
-import android.content.Context;
 import android.content.res.Resources;
 import android.graphics.Color;
 import android.support.v7.widget.RecyclerView;
@@ -22,6 +21,7 @@ import java.util.ArrayList;
 class FFChooser_Secondary_ListAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
 
     private ArrayList<FFChooser_ItemModel> files;
+    private FFChooser_OnItemClickListener ffChooser_onItemClickListener;
 
     public class ItemViewHolder extends RecyclerView.ViewHolder {
         public final FrameLayout root;
@@ -37,8 +37,9 @@ class FFChooser_Secondary_ListAdapter extends RecyclerView.Adapter<RecyclerView.
         }
     }
 
-    public FFChooser_Secondary_ListAdapter(ArrayList<FFChooser_ItemModel> files) {
+    public FFChooser_Secondary_ListAdapter(ArrayList<FFChooser_ItemModel> files, FFChooser_OnItemClickListener ffChooser_onItemClickListener) {
         this.files = files;
+        this.ffChooser_onItemClickListener = ffChooser_onItemClickListener;
     }
 
     @Override
@@ -136,6 +137,13 @@ class FFChooser_Secondary_ListAdapter extends RecyclerView.Adapter<RecyclerView.
             }
             holder.subtitle.setText(getSize(file));
         }
+
+        holder.root.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                ffChooser_onItemClickListener.onItemClick(view, position);
+            }
+        });
     }
 
     private void setIcon(ImageView imageView, int background, int icon, int padding) {

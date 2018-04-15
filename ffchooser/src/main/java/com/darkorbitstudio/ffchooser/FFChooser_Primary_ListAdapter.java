@@ -1,11 +1,13 @@
 package com.darkorbitstudio.ffchooser;
 
+import android.animation.LayoutTransition;
 import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
 import android.content.res.Resources;
 import android.graphics.Bitmap;
 import android.graphics.Color;
 import android.os.AsyncTask;
+import android.os.Build;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -25,6 +27,7 @@ import java.util.ArrayList;
 class FFChooser_Primary_ListAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
 
     private ArrayList<File> files;
+    private FFChooser_OnItemClickListener ffChooser_onItemClickListener;
 
     public class ItemViewHolder extends RecyclerView.ViewHolder {
         public final FrameLayout root;
@@ -48,8 +51,9 @@ class FFChooser_Primary_ListAdapter extends RecyclerView.Adapter<RecyclerView.Vi
         }
     }
 
-    public FFChooser_Primary_ListAdapter(ArrayList<File> files) {
+    public FFChooser_Primary_ListAdapter(ArrayList<File> files, FFChooser_OnItemClickListener ffChooser_onItemClickListener) {
         this.files = files;
+        this.ffChooser_onItemClickListener = ffChooser_onItemClickListener;
     }
 
     @Override
@@ -103,6 +107,13 @@ class FFChooser_Primary_ListAdapter extends RecyclerView.Adapter<RecyclerView.Vi
             }
             showSpace(holder, file);
         }
+
+        holder.root.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                ffChooser_onItemClickListener.onItemClick(view, position);
+            }
+        });
     }
 
     private void showSpace(final ItemViewHolder holder, final File file) {
