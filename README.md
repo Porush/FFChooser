@@ -1,5 +1,5 @@
 # FFChooser - File And Folder Chooser
-[![](https://img.shields.io/badge/jitpack-v0.1--beta-brightgreen.svg?style=for-the-badge)](https://jitpack.io/#Porush/FFChooser) 
+[![](https://img.shields.io/badge/jitpack-v0.1-brightgreen.svg?style=for-the-badge)](https://jitpack.io/#Porush/FFChooser) 
 [![GitHub issues](https://img.shields.io/github/issues/Porush/FFChooser.svg?style=for-the-badge)](https://github.com/Porush/FFChooser/issues)
  [![GitHub license](https://img.shields.io/github/license/Porush/FFChooser.svg?style=for-the-badge)](https://github.com/Porush/FFChooser/blob/master/LICENSE)
 
@@ -26,15 +26,17 @@ allprojects {
 
 Add this to your app level build.gradle as dependency:
 ```Gradle
-compile 'com.github.Porush:FFChooser:v0.1-beta'
+compile 'com.github.Porush:FFChooser:v0.1'
 ```
 
 # # Use
 ```Java
 FFChooser ffChooser = new FFChooser(MainActivity.this, FFChooser.Select_Type_File);
-ffChooser.setShowHidden(true);
+ffChooser.setShowHidden(false);
 ffChooser.setShowThumbnails(true);
-ffChooser.setMultiSelect(true);
+ffChooser.setMultiSelect(false); // Files only.
+ffChooser.setShowGoogleDrive(false); // If installed.
+ffChooser.setShowOneDrive(false); // If installed.
 ffChooser.setOnSelectListener(new FFChooser.OnSelectListener() {
         @Override
         public void onSelect(int type, String path) {
