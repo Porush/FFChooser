@@ -3,12 +3,18 @@ package com.darkorbitstudio.ffchooser;
 import android.app.Activity;
 import android.app.Dialog;
 import android.app.DialogFragment;
+import android.content.pm.ActivityInfo;
 import android.content.pm.PackageManager;
+import android.content.res.Configuration;
+import android.graphics.Point;
+import android.os.Build;
 import android.os.Bundle;
 import android.support.v7.widget.DefaultItemAnimator;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
+import android.util.TypedValue;
+import android.view.Display;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -47,6 +53,7 @@ public class FFChooser_PrimaryDialogFragment extends DialogFragment {
         return ffChooserNew;
     }
 
+    //@SuppressWarnings("deprecation")
     @Override
     public void onStart() {
         super.onStart();
@@ -57,6 +64,18 @@ public class FFChooser_PrimaryDialogFragment extends DialogFragment {
             dialog.getWindow().addFlags(WindowManager.LayoutParams.FLAG_DRAWS_SYSTEM_BAR_BACKGROUNDS);
         }
     }
+
+    /*private void preventScreenRotation() {
+        if (getResources().getConfiguration().orientation ==  Configuration.ORIENTATION_PORTRAIT) {
+            getActivity().setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
+        } else {
+            getActivity().setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE);
+        }
+    }
+
+    private void releaseScreenRotation() {
+        getActivity().setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_UNSPECIFIED);
+    }*/
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
@@ -69,8 +88,14 @@ public class FFChooser_PrimaryDialogFragment extends DialogFragment {
         final RecyclerView recyclerView = inflaterView.findViewById(R.id.dialog_primary_chooser_recyclerView);
         final ArrayList<File> files = new ArrayList<>();
         for (File file : new File("/storage").listFiles()) {
+            //Log.e("Exc", file.getName());
             String name = file.getName();
             if (!name.equals("knox-emulated") && !name.equals("emulated") && !name.equals("self") && !name.equals("container"))
+                files.add(file);
+        }
+        if (files.isEmpty()) {
+            File file = new File("/sdcard");
+            if (file.exists())
                 files.add(file);
         }
         if (showGoogleDrive && selectType == FFChooser.Select_Type_File && appInstalledOrNot("com.google.android.apps.docs")) {
@@ -129,7 +154,7 @@ public class FFChooser_PrimaryDialogFragment extends DialogFragment {
 
     @Override
     public Dialog onCreateDialog(Bundle savedInstanceState) {
-        return new Dialog(getActivity(), getTheme()){
+        return new Dialog(getActivity(), getTheme()) {
             @Override
             public void onBackPressed() {
                 if (onSelectListener != null)

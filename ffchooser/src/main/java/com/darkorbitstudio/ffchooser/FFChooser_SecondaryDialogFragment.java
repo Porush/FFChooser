@@ -1,15 +1,18 @@
 package com.darkorbitstudio.ffchooser;
 
+import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.app.Dialog;
 import android.app.DialogFragment;
 import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
+import android.content.res.Configuration;
 import android.content.res.Resources;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Canvas;
 import android.graphics.Paint;
+import android.graphics.Point;
 import android.graphics.PorterDuff;
 import android.graphics.PorterDuffXfermode;
 import android.graphics.Rect;
@@ -18,14 +21,22 @@ import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
 import android.media.ThumbnailUtils;
 import android.os.AsyncTask;
+import android.os.Build;
 import android.os.Bundle;
 import android.provider.MediaStore;
+import android.support.annotation.RequiresApi;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v7.widget.DefaultItemAnimator;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.util.DisplayMetrics;
+import android.util.Log;
+import android.util.TypedValue;
+import android.view.Display;
+import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
+import android.view.ViewConfiguration;
 import android.view.ViewGroup;
 import android.view.Window;
 import android.view.WindowManager;
@@ -81,10 +92,55 @@ public class FFChooser_SecondaryDialogFragment extends DialogFragment {
         super.onStart();
         Dialog dialog = getDialog();
         if (dialog != null) {
+            //int fullWidth = getDialog().getWindow().getAttributes().width;
+            //int fullHeight = getDialog().getWindow().getAttributes().height;
+
+            Point size = new Point();
+            getActivity().getWindowManager().getDefaultDisplay().getSize(size);
+            int h = size.y - dpToPx(32);
+
+            WindowManager.LayoutParams layoutParams = new WindowManager.LayoutParams();
+            int orientation = activity.getResources().getConfiguration().orientation;
+            if (orientation == Configuration.ORIENTATION_PORTRAIT) {
+                layoutParams.y = pxToDp(getStatusBarHeight()) - dpToPx(24);
+            } else {
+                layoutParams.x = pxToDp(getStatusBarHeight()) - dpToPx(24);
+            }
+            layoutParams.width = ViewGroup.LayoutParams.MATCH_PARENT;
+            layoutParams.height = hasNavBar(getActivity().getWindowManager()) && android.os.Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP ? h : ViewGroup.LayoutParams.MATCH_PARENT;
+            dialog.getWindow().setAttributes(layoutParams);
+
             dialog.setCancelable(false);
-            dialog.getWindow().setLayout(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT);
             dialog.getWindow().addFlags(WindowManager.LayoutParams.FLAG_DRAWS_SYSTEM_BAR_BACKGROUNDS);
         }
+    }
+
+    public int getStatusBarHeight() {
+        int result = 0;
+        int resourceId = getResources().getIdentifier("status_bar_height", "dimen", "android");
+        if (resourceId > 0) {
+            result = getResources().getDimensionPixelSize(resourceId);
+        }
+        return result;
+    }
+
+    @SuppressLint("NewApi")
+    public boolean hasNavBar (WindowManager windowManager) {
+        Display d = windowManager.getDefaultDisplay();
+
+        DisplayMetrics realDisplayMetrics = new DisplayMetrics();
+        d.getRealMetrics(realDisplayMetrics);
+
+        int realHeight = realDisplayMetrics.heightPixels;
+        int realWidth = realDisplayMetrics.widthPixels;
+
+        DisplayMetrics displayMetrics = new DisplayMetrics();
+        d.getMetrics(displayMetrics);
+
+        int displayHeight = displayMetrics.heightPixels;
+        int displayWidth = displayMetrics.widthPixels;
+
+        return (realWidth - displayWidth) > 0 || (realHeight - displayHeight) > 0;
     }
 
     @Override
@@ -99,13 +155,17 @@ public class FFChooser_SecondaryDialogFragment extends DialogFragment {
         emptyFolder = inflaterView.findViewById(R.id.dialog_secondary_emptyFolder);
         FloatingActionButton fab = inflaterView.findViewById(R.id.dialog_secondary_chooser_fab);
         activity = getActivity();
+        selectType = getArguments().getInt("selectType", FFChooser.Select_Type_File);
         fileFilter = new FileFilter() {
             @Override
             public boolean accept(File file) {
-                return showHidden || !file.isHidden();
+                if (selectType == FFChooser.Select_Type_File) {
+                    return showHidden || !file.isHidden();
+                } else {
+                    return file.isDirectory() && (showHidden || !file.isHidden());
+                }
             }
         };
-        selectType = getArguments().getInt("selectType", FFChooser.Select_Type_File);
         File rootFile = new File(getArguments().getString("rootPath"));
         history = new ArrayList<>();
         files = new ArrayList<>();
@@ -323,6 +383,10 @@ public class FFChooser_SecondaryDialogFragment extends DialogFragment {
 
     private static int dpToPx(int dp) {
         return (int) (dp * Resources.getSystem().getDisplayMetrics().density);
+    }
+
+    private static int pxToDp(int px) {
+        return Math.round(px / (Resources.getSystem().getDisplayMetrics().xdpi / DisplayMetrics.DENSITY_DEFAULT));
     }
 
     private void Sort(ArrayList<FFChooser_ItemModel> files) {
